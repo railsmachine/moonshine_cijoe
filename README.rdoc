@@ -1,0 +1,14 @@
+= Moonshine_Cijoe
+
+=== A plugin for Moonshine[http://github.com/railsmachine/moonshine]
+
+A plugin for installing and managing cijoe.
+
+=== Instructions
+
+* <tt>script/plugin install git://github.com/ACCOUNT/moonshine_cijoe.git</tt>
+* Configure settings if needed
+    configure(:cijoe => {:foo => true})
+* Include the plugin and recipe(s) in your Moonshine manifest
+    plugin :cijoe
+    recipe :cijoe
