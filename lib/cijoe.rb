@@ -1,6 +1,16 @@
 module Cijoe
   def self.included(manifest)
-    manifest.configure :cijoe => { :campfire => {} }
+    manifest.class_eval do
+      extend ClassMethods
+
+      configure :cijoe => { :campfire => {} }
+    end
+  end
+
+  module ClassMethods
+    def cijoe_template_dir
+      @sphinx_template_dir ||= Pathname.new(__FILE__).dirname.dirname.join('templates')
+    end
   end
 
   # TODO move this somewhere else... maybe a puppet type?
@@ -69,10 +79,10 @@ module Cijoe
     end
 
     file '/srv/cijoe/config.ru',
-      :content => template('cijoe.config.ru', binding)
+      :content => template(cijoe_template_dir.join('cijoe.config.ru'), binding)
 
     file '/etc/apache2/sites-available/cijoe',
-      :content => template('cijoe.vhost.erb', binding),
+      :content => template(cijoe_template_dir.join('cijoe.vhost.erb'), binding),
       :ensure => :file,
       :mode => '644',
       :notify => service('apache2'),

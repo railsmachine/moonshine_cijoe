@@ -1,0 +1,12 @@
+<VirtualHost *:80>
+  ServerName <%= configuration[:cijoe][:domain] %>
+  DocumentRoot /srv/cijoe/public
+  <% if configuration[:cijoe][:user] %>
+  <Location / >
+    AuthName "<%= configuration[:cijoe][:domain] %>"
+    AuthType Basic
+    AuthUserFile <%= htpasswd %>
+    require valid-user
+  </Location>
+  <% end %>
+</VirtualHost>
