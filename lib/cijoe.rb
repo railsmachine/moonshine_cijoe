@@ -20,7 +20,7 @@ module Cijoe
         :unless => %Q{
             git config #{key} && test "#{value}" = "$(git config #{key})"
         })
-      exec "git config --add #{key} '#{value}'", options
+      exec "git config #{key} '#{value}'", options
     else
       options = options.reverse_merge(:unless => %Q{
             test -z "$(git config cijoe.runner)"
