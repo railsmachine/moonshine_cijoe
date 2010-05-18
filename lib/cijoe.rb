@@ -9,7 +9,7 @@ module Cijoe
 
   module ClassMethods
     def cijoe_template_dir
-      @sphinx_template_dir ||= Pathname.new(__FILE__).dirname.dirname.join('templates')
+      @cijoe_template_dir ||= Pathname.new(__FILE__).dirname.dirname.join('templates')
     end
   end
 
