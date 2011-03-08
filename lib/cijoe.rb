@@ -51,6 +51,21 @@ module Cijoe
       :alias => "submodules",
       :user  => configuration[:user],
       :require => exec("clone #{project}")
+    
+    exec 'bundle install',
+      :user => configuration[:user],
+      :onlyif => "test -f /srv/cijoe/#{project}/Gemfile.lock",
+      :require => [ exec('submodules'), package('bundler') ]
+    
+    if configuration[:rubygems_version] && configuration[:rubygems_version] > '1.4.2'
+      package 'bundler',
+        :provider => :gem,
+        :ensure => :latest
+    else
+      package 'bundler',
+        :provider => :gem,
+        :ensure => '1.0.9'
+    end
 
     git_config 'cijoe.runner', configuration[:cijoe][:runner],
       :cwd => project_path,
