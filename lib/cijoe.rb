@@ -45,7 +45,12 @@ module Cijoe
       :alias => "clone #{project}",
       :user => configuration[:user],
       :unless => "test -d /srv/cijoe/#{project}",
-    :require => file('/srv/cijoe')
+      :require => file('/srv/cijoe')
+
+    exec "cd /srv/cijoe/#{project} && git submodule init && git submodule update",
+      :alias => "submodules",
+      :user  => configuration[:user],
+      :require => exec("clone #{project}")
 
     git_config 'cijoe.runner', configuration[:cijoe][:runner],
       :cwd => project_path,
@@ -89,6 +94,17 @@ module Cijoe
       :alias => 'cijoe_vhost'
 
     a2ensite 'cijoe', :require => file('cijoe_vhost')
-  end
 
+    if configuration[:database][:test][:adapter] == "sqlite" ||
+      configuration[:database][:test][:adapter] == "sqlite3"
+      # generally needed for the test db
+      package 'sqlite3-ruby',
+        :provider => :gem,
+        :ensure => "1.2.5",
+        :require => package('sqlite3')
+      package 'sqlite3',
+        :provider => :apt,
+        :ensure => :present
+    end
+  end
 end
