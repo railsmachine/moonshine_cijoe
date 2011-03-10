@@ -47,20 +47,21 @@ module Cijoe
     file "/srv/cijoe/#{project}/log", :ensure => :directory, :owner => configuration[:user], :require => [exec("cijoe clone #{project}")]
 
     exec "git clone #{repo} #{project_path}",
-      :alias => "clone #{project}",
+      :alias => "cijoe clone #{project}",
       :user => configuration[:user],
       :unless => "test -d /srv/cijoe/#{project}",
       :require => file('/srv/cijoe')
 
     exec "cd /srv/cijoe/#{project} && git submodule init && git submodule update",
-      :alias => "submodules",
+      :alias => "cijoe submodules",
       :user  => configuration[:user],
-      :require => exec("clone #{project}")
+      :require => exec("cijoe clone #{project}")
+
     
     exec 'bundle install',
       :user => configuration[:user],
       :onlyif => "test -f /srv/cijoe/#{project}/Gemfile.lock",
-      :require => [ exec('submodules'), package('bundler') ]
+      :require => [ exec("cijoe clone #{project}", exec('cijoe submodules'), package('bundler') ]
     
     if configuration[:rubygems_version] && configuration[:rubygems_version] > '1.4.2'
       package 'bundler',
@@ -74,7 +75,7 @@ module Cijoe
 
     git_config 'cijoe.runner', configuration[:cijoe][:runner],
       :cwd => project_path,
-      :require => exec("clone #{project}"),
+      :require => [ exec('cijoe bundle'), exec('cijoe submodules') ],
       :user => configuration[:user]
 
     htpasswd = '/srv/cijoe/htpasswd'
@@ -89,7 +90,7 @@ module Cijoe
     end
 
 
-    with_options :cwd => project_path, :require => exec("clone #{project}"), :user => configuration[:user], :notify => service('apache2') do |project_checkout|
+    with_options :cwd => project_path, :require => exec("cijoe clone #{project}"), :user => configuration[:user], :notify => service('apache2') do |project_checkout|
       project_checkout.git_config 'cijoe.user', configuration[:cijoe][:user]
       project_checkout.git_config 'cijoe.pass', configuration[:cijoe][:pass]
       project_checkout.git_config 'campfire.user',  configuration[:cijoe][:campfire] &&configuration[:cijoe][:campfire][:user]
