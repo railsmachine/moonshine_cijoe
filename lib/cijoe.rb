@@ -62,7 +62,7 @@ module Cijoe
       :alias => 'cijoe bundle',
       :user => configuration[:user],
       :onlyif => "test -f /srv/cijoe/#{project}/Gemfile.lock",
-      :require => [ exec("cijoe clone #{project}", exec('cijoe submodules'), package('bundler') ]
+      :require => [ exec("cijoe clone #{project}"), exec('cijoe submodules'), package('bundler') ]
     
     if configuration[:rubygems_version] && configuration[:rubygems_version] > '1.4.2'
       package 'bundler',
