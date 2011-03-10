@@ -58,7 +58,8 @@ module Cijoe
       :require => exec("cijoe clone #{project}")
 
     
-    exec 'bundle install',
+    exec "cd /srv/cijoe/#{project} && bundle install",
+      :alias => 'cijoe bundle',
       :user => configuration[:user],
       :onlyif => "test -f /srv/cijoe/#{project}/Gemfile.lock",
       :require => [ exec("cijoe clone #{project}", exec('cijoe submodules'), package('bundler') ]
@@ -112,7 +113,8 @@ module Cijoe
       :ensure => :file,
       :mode => '644',
       :notify => service('apache2'),
-      :alias => 'cijoe_vhost'
+      :alias => 'cijoe_vhost',
+      :require => [exec('cijoe bundle')]
 
     a2ensite 'cijoe', :require => file('cijoe_vhost')
 
