@@ -32,7 +32,8 @@ module Cijoe
   end
 
   def cijoe
-    gem 'cijoe'
+    gem 'cijoe',
+      :ensure => (configuration[:cijoe][:version] || :present)
 
     file '/srv/cijoe', :ensure => :directory, :owner => configuration[:user]
     file '/srv/cijoe/public', :ensure => :directory, :owner => configuration[:user]
