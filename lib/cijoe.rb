@@ -94,8 +94,7 @@ module Cijoe
     with_options :cwd => project_path, :require => exec("cijoe clone #{project}"), :user => configuration[:user], :notify => service('apache2') do |project_checkout|
       project_checkout.git_config 'cijoe.user', configuration[:cijoe][:user]
       project_checkout.git_config 'cijoe.pass', configuration[:cijoe][:pass]
-      project_checkout.git_config 'campfire.user',  configuration[:cijoe][:campfire] &&configuration[:cijoe][:campfire][:user]
-      project_checkout.git_config 'campfire.pass', configuration[:cijoe][:campfire] && configuration[:cijoe][:campfire][:pass]
+      project_checkout.git_config 'campfire.token', configuration[:cijoe][:campfire] && configuration[:cijoe][:campfire][:token]
       project_checkout.git_config 'campfire.subdomain', configuration[:cijoe][:campfire] && configuration[:cijoe][:campfire][:subdomain]
       project_checkout.git_config 'campfire.room', configuration[:cijoe][:campfire] && configuration[:cijoe][:campfire][:room]
       project_checkout.git_config 'campfire.ssl', configuration[:cijoe][:campfire] && configuration[:cijoe][:campfire][:ssl]
