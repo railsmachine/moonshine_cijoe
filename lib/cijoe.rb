@@ -34,7 +34,7 @@ module Cijoe
   def cijoe
     gem 'cijoe',
       :ensure => (configuration[:cijoe][:version] || :present)
-    if File.exist? "#{cofiguration[:deploy_to]}/current/Gemfile.lock"
+    if File.exist? "#{configuration[:deploy_to]}/current/Gemfile.lock"
       gem 'bundler'
     end
 
