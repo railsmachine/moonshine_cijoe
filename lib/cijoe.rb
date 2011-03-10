@@ -44,6 +44,7 @@ module Cijoe
     project      = configuration[:application]
     repo         = configuration[:repository]
     project_path = "/srv/cijoe/#{project}"
+    file "/srv/cijoe/#{project}/log", :ensure => :directory, :owner => configuration[:user], :require => [exec("cijoe clone #{project}")]
 
     exec "git clone #{repo} #{project_path}",
       :alias => "clone #{project}",
