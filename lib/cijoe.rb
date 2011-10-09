@@ -17,16 +17,19 @@ module Cijoe
   def git_config(key, value, options = {})
     if value.present?
       options = options.reverse_merge(
-        :unless => %Q{
-            git config #{key} && test "#{value}" = "$(git config #{key})"
-        })
-      exec "git config #{key} '#{value}'", options
+        :unless => %Q{git config #{key} && test "#{value}" = "$(git config #{key})"},
+        :alias => "git config #{key}",
+        :command => "git config #{key} '#{value}'"
+      )
+      exec "git config #{key}", options
     else
-      options = options.reverse_merge(:unless => %Q{
-            test "$(git config #{key})" = ""
-        })
+      options = options.reverse_merge(
+        :unless => %Q{test "$(git config #{key})" = ""},
+        :alias => "git config --unset #{key}",
+        :command => "git config --unset #{key} || true"
+      )
 
-      exec "git config --unset #{key} || true", options
+      exec "git config unset #{key}", options
     end
     
   end
@@ -52,17 +55,24 @@ module Cijoe
       :unless => "test -d /srv/cijoe/#{project}",
       :require => file('/srv/cijoe')
 
-    exec "cd /srv/cijoe/#{project} && git submodule init && git submodule update",
-      :alias => "cijoe submodules",
+    exec "cijoe submodule init",
+      :cwd => "/srv/cijoe/#{project}",
+      :command => "git submodule init",
       :user  => configuration[:user],
       :require => exec("cijoe clone #{project}")
 
+    exec "cijoe submodule update",
+      :cwd => "/srv/cijoe/#{project}",
+      :command => "git submodule init",
+      :user  => configuration[:user],
+      :require => [exec("cijoe clone #{project}"), exec("cijoe submodule init")]
     
-    exec "cd /srv/cijoe/#{project} && bundle install",
-      :alias => 'cijoe bundle',
+    exec 'cijoe bundle',
+      :cwd => "/srv/cijoe/#{project}",
+      :command => "bundle install",
       :user => configuration[:user],
       :onlyif => "test -f /srv/cijoe/#{project}/Gemfile.lock",
-      :require => [ exec("cijoe clone #{project}"), exec('cijoe submodules'), package('bundler') ]
+      :require => [ exec("cijoe clone #{project}"), exec('cijoe submodule init'), package('bundler') ]
     
     if configuration[:rubygems_version] && configuration[:rubygems_version] > '1.4.2'
       package 'bundler',
@@ -76,7 +86,7 @@ module Cijoe
 
     git_config 'cijoe.runner', configuration[:cijoe][:runner],
       :cwd => project_path,
-      :require => [ exec('cijoe bundle'), exec('cijoe submodules') ],
+      :require => [ exec('cijoe bundle'), exec('cijoe submodule update') ],
       :user => configuration[:user]
 
     htpasswd = '/srv/cijoe/htpasswd'
