@@ -37,9 +37,6 @@ module Cijoe
   def cijoe
     gem 'cijoe',
       :ensure => (configuration[:cijoe][:version] || :present)
-    if File.exist? "#{configuration[:deploy_to]}/current/Gemfile.lock"
-      gem 'bundler'
-    end
 
     file '/srv/cijoe', :ensure => :directory, :owner => configuration[:user]
     file '/srv/cijoe/public', :ensure => :directory, :owner => configuration[:user]
@@ -74,15 +71,9 @@ module Cijoe
       :onlyif => "test -f /srv/cijoe/#{project}/Gemfile.lock",
       :require => [ exec("cijoe clone #{project}"), exec('cijoe submodule init'), package('bundler') ]
     
-    if configuration[:rubygems_version] && configuration[:rubygems_version] > '1.4.2'
-      package 'bundler',
-        :provider => :gem,
-        :ensure => :latest
-    else
-      package 'bundler',
-        :provider => :gem,
-        :ensure => '1.0.9'
-    end
+    package 'bundler',
+      :provider => :gem,
+      :ensure => :installed
 
     git_config 'cijoe.runner', configuration[:cijoe][:runner],
       :cwd => project_path,
