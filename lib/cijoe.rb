@@ -73,7 +73,7 @@ module Cijoe
     
     package 'bundler',
       :provider => :gem,
-      :ensure => :installed
+      :ensure => configuration[:bundler_version] || :installed
 
     git_config 'cijoe.runner', configuration[:cijoe][:runner],
       :cwd => project_path,
