@@ -1,10 +1,10 @@
-= Moonshine_Cijoe
+# Moonshine_Cijoe
 
-=== A plugin for Moonshine[http://github.com/railsmachine/moonshine]
+### A plugin for [Moonshine](http://github.com/railsmachine/moonshine)
 
 A plugin for installing and managing cijoe.
 
-=== Instructions
+### Instructions
 
 Install the plugin:
 
@@ -36,3 +36,6 @@ Add the recipe to your manifest, ie <tt>app/manifests/application\_manifest.rb</
       recipe :cijoe
     end
 
+***
+
+Unless otherwise specified, all content copyright &copy; 2014, [Rails Machine, LLC](http://railsmachine.com)
